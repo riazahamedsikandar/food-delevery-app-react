@@ -1,15 +1,33 @@
 import React, { createContext, useContext, useReducer } from "react";
-import reducer from "../reducers/sidebarReducer";
-import { OPEN_SIDEBAR, CLOSE_SIDEBAR } from "../actions/actions";
+
+const OPEN_SIDEBAR = "OPEN_SIDEBAR";
+const CLOSE_SIDEBAR = "CLOSE_SIDEBAR";
 
 const initialState = {
   isSidebarOpen: false,
 };
 
-const SidebarContext = createContext({});
+const SidebarContext = createContext(initialState);
+
+const sidebarReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case OPEN_SIDEBAR:
+      return {
+        ...state,
+        isSidebarOpen: true,
+      };
+    case CLOSE_SIDEBAR:
+      return {
+        ...state,
+        isSidebarOpen: false,
+      };
+    default:
+      return state;
+  }
+};
 
 export const SidebarProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(sidebarReducer, initialState);
 
   const openSidebar = () => {
     dispatch({ type: OPEN_SIDEBAR });
@@ -33,5 +51,9 @@ export const SidebarProvider = ({ children }) => {
 };
 
 export const useSidebarContext = () => {
-  return useContext(SidebarContext);
+  const context = useContext(SidebarContext);
+  if (context === undefined) {
+    throw new Error("useSidebarContext must be used within a SidebarProvider");
+  }
+  return context;
 };
